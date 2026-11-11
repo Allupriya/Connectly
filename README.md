@@ -22,11 +22,10 @@ A real-time messaging application inspired by modern chat platforms, built using
 |---|---|
 | Backend | Python, FastAPI |
 | Database | MongoDB |
-| Database Driver | Motor |
 | Real-Time Communication | WebSockets |
-| File Storage | MongoDB GridFS |
+| File Storage | MongoDB |
 | Frontend | HTML, CSS, JavaScript |
-| API Documentation | FastAPI / Swagger UI |
+| API Documentation | FastAPI|
 | Version Control | Git, GitHub |
 
 ---
