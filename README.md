@@ -1,110 +1,228 @@
-# ChatSystem
+# Connectly – Real-Time Messaging Platform
 
-A Telegram-style chat app built with **FastAPI** + **WebSockets** and **MongoDB**.
+A real-time messaging application inspired by modern chat platforms, built using **Python, FastAPI, WebSockets, and MongoDB**. Connectly enables users to communicate through private conversations and group chats, share files, and view live user activity.
 
 ## Features
 
-- Simple login — just pick a username (auto-creates the user, no password)
-- **1-on-1 direct messages** and **group chats**
-- **Real-time messaging** over WebSockets
-- **Persistent history** stored in MongoDB
-- **Online / offline presence** and **typing indicators**
-- **File & image sharing**
-- Clean vanilla HTML/CSS/JS frontend served by the backend
+- **Simple User Login:** Join the application using a username.
+- **One-to-One Messaging:** Send private messages between users.
+- **Group Conversations:** Create groups and communicate with multiple users.
+- **Real-Time Messaging:** Exchange messages instantly using WebSockets.
+- **Message Persistence:** Store and retrieve chat history using MongoDB.
+- **Online/Offline Status:** View users' current availability.
+- **Typing Indicators:** See when another user is typing.
+- **File & Image Sharing:** Upload and share files and images within conversations.
+- **Responsive Interface:** Clean frontend built with HTML, CSS, and JavaScript.
 
-## Project structure
+---
 
-```
-chattingsystem/
+## Technology Stack
+
+| Category | Technologies |
+|---|---|
+| Backend | Python, FastAPI |
+| Database | MongoDB |
+| Database Driver | Motor |
+| Real-Time Communication | WebSockets |
+| File Storage | MongoDB GridFS |
+| Frontend | HTML, CSS, JavaScript |
+| API Documentation | FastAPI / Swagger UI |
+| Deployment | Render |
+| Version Control | Git, GitHub |
+
+---
+
+## Project Architecture
+
+```text
+Connectly/
+│
 ├── backend/
-│   ├── app.py               # FastAPI app: wiring, lifespan, exception handlers
-│   ├── config/              # Configuration
-│   │   ├── settings.py      # Env-driven settings (URLs, collection names...)
-│   │   └── logging.py       # Central logging setup
+│   ├── app.py
+│   ├── config/
+│   │   ├── settings.py
+│   │   └── logging.py
+│   │
 │   ├── db/
-│   │   └── database.py      # MongoDB (Motor) connection, collections, GridFS
+│   │   └── database.py
+│   │
 │   ├── models/
-│   │   └── schemas.py       # Pydantic models + serialization helpers
-│   ├── services/            # Business logic
-│   │   ├── messages.py      # Message storage
-│   │   └── ws_manager.py    # Live WebSocket connection tracking
+│   │   └── schemas.py
+│   │
+│   ├── services/
+│   │   ├── messages.py
+│   │   └── ws_manager.py
+│   │
 │   ├── utils/
-│   │   └── helpers.py       # Id parsing + document shaping helpers
-│   └── routers/             # HTTP + WebSocket endpoints
+│   │   └── helpers.py
+│   │
+│   └── routers/
 │       ├── users.py
 │       ├── chats.py
 │       ├── files.py
 │       └── websocket.py
+│
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
 │   └── app.js
-├── render.yaml              # Render deploy blueprint
+│
+├── .env.example
+├── .gitignore
+├── render.yaml
 ├── requirements.txt
-└── .env.example
+├── runtime.txt
+└── README.md
 ```
 
-All environment-specific and sensitive values (MongoDB URL/credentials,
-database name, collection and GridFS bucket names, log level) are read from the
-`.env` file via `backend/config/settings.py` — nothing is hard-coded.
+---
 
-## Setup
+## Getting Started
 
-### 1. Create a virtual environment and install dependencies
+Follow these instructions to run Connectly locally.
 
-Windows (PowerShell):
+### Prerequisites
+
+Make sure you have installed:
+
+- Python 3.10 or later (use the version supported by the project dependencies).
+- MongoDB Atlas account or a local MongoDB installation.
+- Git.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Allupriya/Connectly.git
+cd Connectly
+```
+
+### 2. Create a Virtual Environment
+
+**Windows (PowerShell):**
 
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configure MongoDB
+### 4. Configure Environment Variables
 
-Copy `.env.example` to `.env` and set your MongoDB connection string:
+Create a `.env` file in the project root by copying the example file.
 
+```powershell
+Copy-Item .env.example .env
 ```
-MONGODB_URL=mongodb+srv://user:password@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+
+Update `.env` with your MongoDB connection details:
+
+```env
+MONGODB_URL=mongodb+srv://username:password@cluster-url/
 MONGODB_DB=chattingsystem
 ```
 
-You can use a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster or a local `mongodb://localhost:27017`.
+Replace the example connection string with your actual MongoDB connection URL.
 
-### 3. Run the server
+**Important:** Never commit your `.env` file or expose database credentials in a public repository.
 
-```powershell
+### 5. Run the Application
+
+Start the FastAPI development server:
+
+```bash
 uvicorn backend.app:app --reload
 ```
 
-Open http://localhost:8000 in your browser.
+Open the application in your browser:
 
-## Try it out
+**Application:** http://localhost:8000
 
-1. Open the site in two different browsers (or one normal + one incognito window).
-2. Log in with a different username in each.
-3. Click **+ New chat** to start a DM, or **+ New group** to create a room.
-4. Send messages, share files, and watch typing indicators and online status update live.
+**API Documentation:** http://localhost:8000/docs
 
-## Deploy to Render
+---
 
-This repo includes a `render.yaml` blueprint, so deploying is one step:
+## How to Use
 
-1. Push the repo to GitHub.
-2. In Render, click **New +** → **Blueprint** and select the repo.
-3. When prompted, fill in the secret env vars (they are **not** stored in git):
-   - `MONGODB_URL` (and optionally `MONGODB_USERNAME` / `MONGODB_PASSWORD`)
-4. Deploy. Render runs:
+1. Open Connectly in your browser.
+2. Enter a username to join the application.
+3. Start a direct conversation with another registered user.
+4. Create a group and select its members.
+5. Exchange messages in real time.
+6. Share files and images within conversations.
+7. View online status and typing indicators.
 
-```
+For testing, open the application in two different browsers or use a normal and an incognito window with different usernames.
+
+---
+
+## Database
+
+Connectly uses MongoDB for persistent storage.
+
+The application uses MongoDB collections to manage user accounts, conversations, messages, and related data.
+
+MongoDB GridFS is used to store uploaded files and images.
+
+Database configuration is managed through environment variables rather than hardcoded credentials.
+
+---
+
+## Deployment
+
+Connectly includes a `render.yaml` configuration for deployment on [Render](https://render.com/).
+
+General deployment steps:
+
+1. Push the project to GitHub.
+2. Sign in to Render.
+3. Select **New → Blueprint**.
+4. Connect your GitHub repository.
+5. Configure the required environment variables, including `MONGODB_URL` and `MONGODB_DB`.
+6. Deploy the application.
+
+The deployment command is:
+
+```bash
 pip install -r requirements.txt
 uvicorn backend.app:app --host 0.0.0.0 --port $PORT
 ```
 
-Uploads are stored in MongoDB (GridFS), so the app works fine on Render's
-ephemeral filesystem — nothing is written to local disk.
+Make sure your MongoDB Atlas network access settings allow connections from your deployment environment.
 
-## Notes
+---
 
-- Auth is intentionally minimal (username only) for easy testing. Add passwords/JWT before any real deployment.
-- Uploaded files are stored in MongoDB using GridFS (the `uploads` bucket) and streamed back via `GET /uploads/{file_id}`. Nothing is written to local disk, so the app works on hosts with an ephemeral filesystem (e.g. Render).
+## Security Considerations
+
+- The current login implementation uses username-only authentication without passwords.
+- This version is intended for demonstration and learning purposes.
+- Password-based authentication and stronger session management should be implemented before handling sensitive conversations.
+- Keep database credentials and private environment variables outside the public repository.
+
+---
+
+## Future Improvements
+
+- Secure authentication using JWT and password hashing.
+- Message read receipts and delivery status.
+- Message editing and deletion.
+- Push notifications for new messages.
+- Improved mobile responsiveness.
+- Message search and filtering.
+- User profile management.
+
+---
+
+## Author
+
+**Allupriya**
+
+GitHub: [@Allupriya](https://github.com/Allupriya)
+
+Project: [Connectly – Real-Time Messaging Platform](https://github.com/Allupriya/Connectly)
+---
+*Connectly – Bringing conversations closer, one message at a time.*
