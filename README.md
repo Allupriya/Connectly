@@ -27,7 +27,6 @@ A real-time messaging application inspired by modern chat platforms, built using
 | File Storage | MongoDB GridFS |
 | Frontend | HTML, CSS, JavaScript |
 | API Documentation | FastAPI / Swagger UI |
-| Deployment | Render |
 | Version Control | Git, GitHub |
 
 ---
@@ -209,8 +208,6 @@ Make sure your MongoDB Atlas network access settings allow connections from your
 
 - Secure authentication using JWT and password hashing.
 - Message read receipts and delivery status.
-- Message editing and deletion.
-- Push notifications for new messages.
 - Improved mobile responsiveness.
 - Message search and filtering.
 - User profile management.
