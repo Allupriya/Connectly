@@ -1,0 +1,474 @@
+================================================================================
+ROADMAP: FROM BACKEND DEVELOPER TO SYSTEMS / DISTRIBUTED-SYSTEMS EXPERT
+Goal: be able to build things like Kafka, Redis, Nginx, RabbitMQ, WebSockets.
+================================================================================
+
+MINDSET (read this first)
+- This is a 3-5 year journey, not a checklist. Don't try to "finish" every stage
+  before building. Go DEPTH-FIRST: pick a project, and learn the theory you need
+  JUST IN TIME to unblock it. You remember what you use.
+- The gap between "knows the concept" and "expert" is: tooling, measurement, and
+  correctness testing. Most people skip these. Don't.
+- Read production source code and academic papers early, even when it hurts.
+
+--------------------------------------------------------------------------------
+STAGE 1 - BECOME AN EXCELLENT PROGRAMMER
+--------------------------------------------------------------------------------
+Systems language (pick ONE to go deep, know OF the others):
+  C     - best for learning what the machine really does
+  Rust  - memory safety without GC; the modern infra language
+  Go    - fantastic for networked/backend infra (Docker, Kubernetes, etcd)
+  C++   - still dominant in databases and high-perf systems
+Master: data structures, algorithms, manual memory management, pointers,
+        ownership/lifetimes (Rust), the stack vs the heap, undefined behavior.
+
+--------------------------------------------------------------------------------
+STAGE 2 - CS FUNDAMENTALS (implement, don't just read)
+--------------------------------------------------------------------------------
+Data structures: arrays, linked lists, stacks, queues, ring buffers, trees,
+  graphs, hash tables, heaps, tries, bloom filters, skip lists, LRU cache.
+Algorithms: searching, sorting, DP, graph algos, greedy, string algos,
+  hashing (and consistent hashing - critical for sharding).
++ ADD: complexity analysis in practice (why O(1) with a bad constant can lose
+  to O(log n)), and cache-aware data structures.
+
+--------------------------------------------------------------------------------
+STAGE 3 - OPERATING SYSTEMS  *****
+--------------------------------------------------------------------------------
+Processes, threads, scheduling, context switching, virtual memory, paging,
+TLB, deadlocks, synchronization, mutexes, semaphores, condition variables,
+shared memory, file systems, signals.
++ ADD: the page cache, mmap vs read/write, fsync/fdatasync and what "durability"
+  really means, copy-on-write, huge pages, NUMA.
++ ADD (tooling): strace, ltrace, /proc, gdb, perf, valgrind, ftrace, eBPF/bpftrace.
+Resource: "Operating Systems: Three Easy Pieces" (OSTEP) - free and excellent.
+Resource: "Computer Systems: A Programmer's Perspective" (CSAPP).
+
+--------------------------------------------------------------------------------
+STAGE 4 - COMPUTER NETWORKS  *****
+--------------------------------------------------------------------------------
+TCP, UDP, IP, DNS, HTTP/1.1, HTTP/2, HTTP/3 (QUIC), TLS/SSL, routing, ports.
++ ADD: TCP internals - 3-way handshake, flow control, congestion control
+  (slow start, Nagle's algorithm, delayed ACK), backpressure, head-of-line
+  blocking, MTU, Nagle vs TCP_NODELAY.
++ ADD: the C10k / C10M problem and why it drove epoll/kqueue/io_uring.
++ ADD (tooling): Wireshark, tcpdump, ss/netstat, ping/traceroute, curl -v.
+Resource: "Beej's Guide to Network Programming" (free).
+Resource: "Computer Networking: A Top-Down Approach" (Kurose & Ross).
+
+--------------------------------------------------------------------------------
+STAGE 5 - SOCKET PROGRAMMING (build the foundations of WebSockets)
+--------------------------------------------------------------------------------
+syscalls: socket(), bind(), listen(), accept(), connect(), recv(), send(),
+  close(), setsockopt(), shutdown().
+I/O models: blocking, non-blocking, I/O multiplexing (select -> poll -> epoll
+  /kqueue), edge-triggered vs level-triggered, and finally io_uring.
+Build: echo server -> multi-client chat server -> file transfer -> an HTTP/1.1
+  server -> a WebSocket server (implement the RFC 6455 handshake + framing
+  yourself; this directly demystifies your current chat app).
++ ADD: zero-copy I/O (sendfile, splice), scatter/gather (writev/readv).
+
+--------------------------------------------------------------------------------
+STAGE 6 - CONCURRENCY & PARALLELISM
+--------------------------------------------------------------------------------
+Threads, async I/O, event loops, multiprocessing, futures/promises, thread pools.
++ ADD (the hard, expert part):
+  - Memory models & memory ordering (acquire/release/seq-cst), happens-before.
+  - Atomics, CAS (compare-and-swap), the ABA problem.
+  - Lock-free & wait-free data structures, false sharing, cache-line padding.
+  - Concurrency models: shared-memory + locks, actor model, CSP (Go channels),
+    work-stealing schedulers.
+Languages: Go goroutines, Rust async/tokio, C++ std::thread/std::atomic.
+
+--------------------------------------------------------------------------------
+STAGE 7 - DISTRIBUTED SYSTEMS  *****  (the heart of Kafka)
+--------------------------------------------------------------------------------
+Replication, leader election, consensus, sharding, partitioning, CAP theorem,
+eventual consistency, distributed locks.
++ ADD:
+  - Time & ordering: Lamport clocks, vector clocks, hybrid logical clocks.
+  - Consistency models: linearizability vs serializability vs causal.
+  - Delivery semantics: at-most / at-least / "exactly-once" (and why true
+    exactly-once is a myth without idempotency + dedup).
+  - Quorums (R + W > N), hinted handoff, read repair, Merkle trees, anti-entropy.
+  - Gossip protocols, membership (SWIM), failure detectors.
+  - CRDTs, the FLP impossibility result, the two-generals & Byzantine problems.
+Algorithms: Raft (start here, it's teachable), Paxos/Multi-Paxos, ZAB, Viewstamped
+  Replication.
+Resource: MIT 6.824 Distributed Systems - free lectures + labs where YOU build
+  a fault-tolerant Raft-based KV store. Do the labs.
+Resource: "Designing Data-Intensive Applications" (Kleppmann) - the bible. Read
+  it twice.
+Resource: The Raft paper + https://raft.github.io visualization.
+
+--------------------------------------------------------------------------------
+STAGE 8 - DATABASE / STORAGE INTERNALS
+--------------------------------------------------------------------------------
+B-Trees, B+Trees, WAL (write-ahead logging), transactions, ACID, MVCC, isolation
+levels, indexes, query optimization.
++ ADD: LSM-trees vs B-trees, SSTables, compaction strategies, bloom filters,
+  the log-structured storage idea (this IS Kafka's core), write/read/space
+  amplification, checksums & corruption handling.
+Resource: "Database Internals" (Alex Petrov). Read SQLite and LevelDB/RocksDB.
+
+--------------------------------------------------------------------------------
+STAGE 9 - MESSAGE QUEUES & STREAMING (study before rebuilding)
+--------------------------------------------------------------------------------
+Study: Kafka, RabbitMQ, Redis Streams, NATS, BullMQ, Pulsar.
+Concepts: producer, consumer, consumer groups, topic, partition, offset,
+  acknowledgements, at-least-once vs exactly-once, backpressure, dead-letter
+  queues, retention & compaction, the commit log as the source of truth.
+Papers: "Kafka: a Distributed Messaging System", the LinkedIn "The Log" article
+  by Jay Kreps.
+
+--------------------------------------------------------------------------------
+STAGE 10 - PERFORMANCE ENGINEERING
+--------------------------------------------------------------------------------
+CPU cache & cache locality, branch prediction, memory allocation & custom
+allocators, zero-copy, buffer pools, lock-free programming, SIMD, batching,
+mechanical sympathy.
++ ADD (methodology - the expert differentiator):
+  - Measure, don't guess. Latency PERCENTILES (p50/p99/p999), never averages.
+  - Beware "coordinated omission" (read Gil Tene's talks).
+  - Flamegraphs (perf + FlameGraph), USE method, Little's Law.
+Resource: Brendan Gregg's "Systems Performance".
+
+--------------------------------------------------------------------------------
+STAGE 11 - CORRECTNESS & TESTING (usually skipped; this makes you elite)
+--------------------------------------------------------------------------------
+- Property-based testing (QuickCheck-style).
+- Fuzzing (AFL, libFuzzer, cargo-fuzz).
+- Deterministic Simulation Testing (FoundationDB / TigerBeetle style) - run a
+  whole distributed system in one deterministic thread and inject faults.
+- Jepsen / chaos testing - break real clusters (partitions, clock skew, crashes)
+  and check invariants.
+- Fault injection, model checking (TLA+ / TLC for verifying protocols like Raft).
+
+--------------------------------------------------------------------------------
+STAGE 12 - DESIGN PATTERNS & ARCHITECTURE
+--------------------------------------------------------------------------------
+Factory, singleton, observer, builder, command, state, strategy.
++ ADD systems-level patterns: reactor & proactor, pipeline, half-sync/half-async,
+  circuit breaker, bulkhead, leader/follower, sidecar, event sourcing, CQRS.
+
+--------------------------------------------------------------------------------
+STAGE 13 - READ SOURCE CODE & PAPERS (learn the most here)
+--------------------------------------------------------------------------------
+Source: Redis (very readable C), SQLite, Nginx, Kafka, PostgreSQL, LevelDB/RocksDB,
+  etcd (Go + Raft), BullMQ, CPython, Node.js/libuv.
+Papers to read (Papers We Love has them): Google GFS, MapReduce, BigTable,
+  Amazon Dynamo, Raft, Chubby, Spanner, the Kafka paper.
+Skill: learn to read a paper in 3 passes; write a short summary of each.
+
+--------------------------------------------------------------------------------
+PROJECT LADDER (build these in order; give each a measurable goal)
+--------------------------------------------------------------------------------
+1.  TCP echo server                       (goal: handle 1k concurrent conns)
+2.  Multi-client chat server               (goal: use epoll, single thread)
+3.  HTTP/1.1 server from scratch           (goal: pass basic curl tests)
+4.  WebSocket server (RFC 6455)            (goal: rebuild YOUR chat backend)
+5.  In-memory key-value store (mini Redis) (goal: RESP protocol + TTL)
+6.  Add persistence: WAL + snapshotting    (goal: survive a crash, no data loss)
+7.  Task queue                             (goal: at-least-once + retries + DLQ)
+8.  Pub/Sub system                          (goal: fan-out to N subscribers)
+9.  Persistent commit-log message queue     (goal: partitions + offsets)
+10. Replicated KV store with Raft           (goal: survive a node failure)
+11. Distributed, partitioned queue          (goal: rebalancing + consumer groups)
+12. Kafka-like event streaming platform     (goal: replication + retention)
+
+--------------------------------------------------------------------------------
+SUGGESTED HIGH-LEVEL ORDER
+--------------------------------------------------------------------------------
+Programming (C/Rust/Go) -> DS & Algorithms -> Operating Systems ->
+Computer Networks -> Socket Programming -> Concurrency -> Storage/DB Internals ->
+Distributed Systems -> Performance -> Correctness/Testing ->
+Read + contribute to open-source infra.
+
+--------------------------------------------------------------------------------
+YOUR PERSONAL STARTING POINT (given Python + Mongo + queues background)
+--------------------------------------------------------------------------------
+1. Learn Go (fastest path to infra) OR Rust (if you want to go hardcore).
+2. Rebuild your current WebSocket chat server FROM SCRATCH in that language,
+   implementing the RFC 6455 handshake and framing yourself. You already know
+   the app behavior - now learn the layer beneath it.
+3. Build a mini-Redis (RESP + TTL), then add a WAL for persistence.
+4. Do MIT 6.824 and build Raft.
+5. Then build a persistent commit-log queue and study how Kafka extends it with
+   partitions, replication, and distributed coordination.
+================================================================================
+
+
+
+================================================================================
+DAY-BY-DAY STUDY PLAN  (2 hrs/day, 6 days/week, Sun = review)
+Language: Go   |   Phase 1: Programming + DSA + OS foundations (Weeks 1-12)
+================================================================================
+
+------------------------- WEEK 1 : Go syntax & types ---------------------------
+Day 1  Install Go + VS Code/Go tools. go run/build/mod. Hello world, packages.
+Day 2  Variables, types, constants, iota, zero values, type conversions.
+Day 3  Control flow: if / for / switch / defer. Small exercises (FizzBuzz etc).
+Day 4  Functions: multiple returns, named returns, variadic, closures.
+Day 5  Arrays vs slices: len/cap, append, slicing internals (draw the memory).
+Day 6  Maps and structs. Build a tiny word-frequency counter.
+Day 7  REVIEW: redo 3 exercises from memory. Note weak spots.
+
+--------------------- WEEK 2 : Go methods & interfaces -------------------------
+Day 8   Pointers in Go: & and *, when to use pointer receivers.
+Day 9   Methods on structs; value vs pointer receivers (write both, compare).
+Day 10  Interfaces: implicit satisfaction, the empty interface, type assertions.
+Day 11  Errors: error interface, wrapping (%w), errors.Is/As, custom errors.
+Day 12  Generics (type parameters) - basic constraints.
+Day 13  Mini-project: a generic in-memory stack + queue with tests.
+Day 14  REVIEW + refactor week's code.
+
+----------------------- WEEK 3 : Go concurrency --------------------------------
+Day 15  Goroutines: go keyword, the scheduler at a high level.
+Day 16  Channels: unbuffered vs buffered, direction, closing, range.
+Day 17  select statement, timeouts with time.After, default case.
+Day 18  sync package: WaitGroup, Mutex, RWMutex.
+Day 19  Context: cancellation, deadlines, passing context through calls.
+Day 20  Concurrency pattern: worker pool (N workers, jobs channel).
+Day 21  REVIEW: rebuild the worker pool from scratch, no notes.
+
+------------------- WEEK 4 : Go tooling + first toy ----------------------------
+Day 22  go test: table-driven tests, subtests, t.Run.
+Day 23  Benchmarks (testing.B), the race detector (go test -race).
+Day 24  Profiling intro: pprof (CPU + memory profile of a small program).
+Day 25  Standard library tour: io, bufio, encoding/json, net basics.
+Day 26  PROJECT start: concurrent CLI that fetches N URLs and reports latency.
+Day 27  PROJECT finish + write tests + profile it.
+Day 28  REVIEW: you should now be comfortable in Go. Note gaps to revisit.
+
+------------------ WEEK 5 : DSA - linear structures ----------------------------
+Day 29  Big-O in practice; measure a slow vs fast approach with benchmarks.
+Day 30  Implement a singly + doubly linked list.
+Day 31  Implement stack + queue (on slice, then on linked list).
+Day 32  Ring buffer / circular queue (you'll reuse this in networking!).
+Day 33  Two-pointer & sliding-window problems (5 problems).
+Day 34  Practice day: 5 easy array/string problems.
+Day 35  REVIEW.
+
+------------------ WEEK 6 : DSA - hashing, trees, heaps ------------------------
+Day 36  Hash tables: implement one with open addressing + separate chaining.
+Day 37  Collisions, load factor, resizing. Benchmark vs Go's built-in map.
+Day 38  Binary search tree: insert/search/delete/traversals.
+Day 39  Balanced trees concept (AVL / red-black) - understand, don't implement yet.
+Day 40  Heaps / priority queue: implement a binary heap.
+Day 41  Practice: 5 problems using maps/heaps.
+Day 42  REVIEW.
+
+------------------ WEEK 7 : DSA - graphs, tries, sorting -----------------------
+Day 43  Graph representations: adjacency list vs matrix.
+Day 44  BFS + DFS (iterative and recursive).
+Day 45  Shortest path: Dijkstra.
+Day 46  Trie: implement insert/search/prefix.
+Day 47  Sorting: implement quicksort + mergesort; understand stability.
+Day 48  Binary search + variants (5 problems).
+Day 49  REVIEW.
+
+--------------- WEEK 8 : DSA - advanced + infra-relevant -----------------------
+Day 50  Recursion & backtracking (3 problems).
+Day 51  Dynamic programming intro: memoization vs tabulation (3 classic problems).
+Day 52  Greedy algorithms (3 problems).
+Day 53  CONSISTENT HASHING: implement it (used in sharding - Kafka/Redis Cluster).
+Day 54  LRU cache: implement with map + doubly linked list (O(1)).
+Day 55  Bloom filter: implement a simple one (used in LSM/Kafka/Cassandra).
+Day 56  REVIEW: you now have the DSA toolkit infra software actually uses.
+
+------------------ WEEK 9 : OS - processes & scheduling ------------------------
+      (Resource: OSTEP, free online. Read the matching chapters each day.)
+Day 57  Processes vs threads; the process address space (stack/heap/text/data).
+Day 58  fork/exec model; PIDs; parent/child; zombies & orphans.
+Day 59  CPU scheduling: preemptive vs cooperative, time slices.
+Day 60  Context switching: what it costs and why it matters at scale.
+Day 61  Threads: user vs kernel threads; Go's M:N scheduler (goroutines revisited).
+Day 62  Experiment: strace a simple program; watch the syscalls.
+Day 63  REVIEW.
+
+------------------ WEEK 10 : OS - memory ---------------------------------------
+Day 64  Virtual memory & address translation (why every process sees "its own" RAM).
+Day 65  Paging, page tables, TLB.
+Day 66  Page cache; why file reads get fast the 2nd time.
+Day 67  mmap vs read/write; when mmap helps and when it hurts.
+Day 68  Copy-on-write; huge pages; a word on NUMA.
+Day 69  Experiment: measure page-cache effect (cold vs warm file read).
+Day 70  REVIEW.
+
+------------- WEEK 11 : OS - synchronization & durability ----------------------
+Day 71  Race conditions & critical sections (reproduce one, then fix it).
+Day 72  Mutexes & spinlocks; when each makes sense.
+Day 73  Semaphores & condition variables; producer-consumer with a bounded buffer.
+Day 74  Deadlock: the 4 conditions; detection vs prevention vs avoidance.
+Day 75  fsync/fdatasync and what "durable" really means (fysnc lies exist!).
+Day 76  Signals & graceful shutdown (SIGTERM/SIGINT handling in Go).
+Day 77  REVIEW.
+
+------------- WEEK 12 : Tooling + FIRST REAL PROJECT ---------------------------
+Day 78  Debugging: gdb/delve basics; set breakpoints, inspect a goroutine.
+Day 79  perf + flamegraphs: profile something and read the graph.
+Day 80  tcpdump/Wireshark: capture localhost traffic, inspect a TCP handshake.
+Day 81  PROJECT: TCP echo server in Go (net package). Handle one client.
+Day 82  PROJECT: make it concurrent (goroutine per connection); test with nc.
+Day 83  PROJECT: add graceful shutdown + basic load test (many clients).
+Day 84  REVIEW + write a short README of what you built and learned.
+
+  >>> Milestone check: you can program well in Go, know core DSA, understand
+      OS fundamentals, and have built a concurrent TCP server. <<<
+================================================================================
+
+
+
+================================================================================
+WEEKLY CUMULATIVE PROJECTS  (Day 7 of each week = Review + build/extend)
+Rule: use ONLY what you've learned from Day 1 up to that day. One growing repo.
+================================================================================
+
+WEEK 1  (Go syntax, types, slices, maps, structs)
+  Review: redo 3 exercises from memory.
+  PROJECT "notes-cli" v1: a command-line notes/todo app held in memory.
+    Uses: structs, slices, maps, control flow, functions. Add/list/delete notes.
+
+WEEK 2  (methods, interfaces, errors, generics)
+  Review: re-explain interfaces out loud.
+  PROJECT v2: refactor notes-cli behind a Store interface (in-memory impl now).
+    Add a generic Stack[T]/Queue[T]. Proper error wrapping. Save/load to JSON.
+
+WEEK 3  (goroutines, channels, select, sync, context)
+  Review: rebuild a worker pool with no notes.
+  PROJECT v3: add a concurrent "task runner" to the app - submit jobs to a
+    worker pool, results over channels, cancel with context, Mutex-protected store.
+
+WEEK 4  (testing, benchmarks, race detector, pprof, stdlib)
+  Review: run -race on everything; fix any issue.
+  PROJECT v4: add table-driven tests + benchmarks for the whole app; profile it
+    with pprof; wire in the concurrent URL-fetcher as a "job type". 
+    >>> You now have a tested, concurrent Go CLI toolkit. <<<
+
+WEEK 5  (linked list, stack, queue, ring buffer)
+  Review: reimplement a ring buffer from scratch.
+  PROJECT v5: create your own "ds" library (linked list, stack, queue, ring buffer)
+    WITH tests+benchmarks, and swap it into notes-cli where it fits.
+
+WEEK 6  (hash tables, BST, heaps/priority queue)
+  Review: reimplement the hash table.
+  PROJECT v6: add HashMap, BST, and a Heap to your ds library; give the task
+    runner PRIORITY scheduling using your heap.
+
+WEEK 7  (graphs, tries, sorting/searching)
+  Review: reimplement BFS+DFS.
+  PROJECT v7: add Graph + Trie + your own sort; build (a) command autocomplete
+    using the trie, and (b) a job dependency resolver using topological sort.
+
+WEEK 8  (recursion/DP/greedy, consistent hashing, LRU, bloom filter)
+  Review: reimplement the LRU cache.
+  PROJECT v8: add LRUCache, BloomFilter, and a ConsistentHashRing to your library.
+    Build an in-memory cache engine (GET/SET/TTL) on top - NOT networked yet.
+    >>> PHASE-1 CAPSTONE: a cache engine built entirely from YOUR own data structures. <<<
+
+WEEK 9  (processes, threads, scheduling, context switching)
+  Review: strace a program and explain the syscalls.
+  PROJECT v9: build a scheduler SIMULATOR (round-robin + priority) using your
+    queue/heap; visualize context-switch counts and wait times.
+
+WEEK 10 (virtual memory, paging, page cache, mmap)
+  Review: measure cold vs warm file reads.
+  PROJECT v10: build a buffer pool / slab allocator on top of a fixed byte arena
+    (fixed-size page frames, eviction) - reuse your LRU for eviction policy.
+
+WEEK 11 (sync primitives, deadlock, fsync/durability, signals)
+  Review: reproduce and fix a deadlock.
+  PROJECT v11: build a thread-safe bounded buffer (producer/consumer) AND a
+    durable append-only log writer (fsync + graceful shutdown on SIGTERM).
+    This log is the seed of your future WAL.
+
+WEEK 12 (delve, perf/flamegraphs, tcpdump, TCP echo server)
+  Review: capture and read a TCP handshake in Wireshark.
+  PROJECT v12 (Phase-1 finale): put your cache engine (Week 8) BEHIND a TCP server.
+    Clients connect, send GET/SET/DEL/TTL commands; concurrent (goroutine per conn);
+    graceful shutdown (Week 11); profiled (Week 4/12).
+    >>> A networked, concurrent, in-memory KV cache built from your own components. <<<
+================================================================================
+
+Month 4  Networks + HTTP.  PROJECT: replace the ad-hoc TCP protocol with a proper
+         line/RESP-style protocol; add an epoll-style event loop; then add a small
+         HTTP/1.1 front-end so the cache is reachable over HTTP too.
+
+Month 5  WebSockets (RFC 6455 by hand).  PROJECT: add a real-time pub/sub layer -
+         clients subscribe to keys over WebSocket and get pushed updates on SET.
+         (This is your chat app's tech, rebuilt from the socket up.)
+
+Month 6  Concurrency mastery (atomics, CAS, lock-free).  PROJECT: make the cache
+         a real mini-Redis - full RESP protocol, more commands, and replace a hot
+         lock with an atomic/lock-free path; benchmark before/after.
+
+Month 7  Storage internals (WAL, LSM, SSTables, bloom).  PROJECT: give the store
+         crash-safe PERSISTENCE - WAL (from Week 11) + periodic snapshot, then an
+         LSM-tree on disk with SSTables + your bloom filter. Survive kill -9.
+
+Month 8  Distributed systems I (CAP, replication, quorums).  PROJECT: run 3 nodes;
+         add primary/replica async replication of the WAL; handle a replica rejoining.
+
+Month 9  Consensus - Raft (MIT 6.824 labs).  PROJECT: replace async replication
+         with your own Raft implementation so writes are agreed by a majority.
+
+Month 10 Message queues (Kafka/RabbitMQ/NATS study).  PROJECT: build a persistent
+         commit-log queue on your storage engine - topics, partitions, offsets,
+         producers/consumers, consumer groups, at-least-once delivery.
+
+Month 11 Performance engineering.  PROJECT: load-test the queue; fix p99 latency;
+         add batching, zero-copy (sendfile), and buffer pools; publish a benchmark.
+
+Month 12 Correctness.  PROJECT: add a deterministic simulation test harness +
+         fuzzing + a Jepsen-style fault injector (partitions, crashes, clock skew)
+         that asserts your invariants hold.
+================================================================================
+
+
+================================================================================
+CAPSTONE  ***  "MiniStream" - a distributed, persistent event-streaming platform
+             (a from-scratch Kafka, using EVERYTHING above)
+================================================================================
+Build a multi-node event streaming system in Go, from the socket up, reusing your
+own data structures, storage engine, and Raft. This is a months-long, portfolio-
+defining project - the thing that proves you're an infra engineer, not just a user.
+
+CORE REQUIREMENTS
+  1. Custom binary wire protocol over TCP (length-prefixed framing) + a WebSocket
+     gateway for browser clients (your RFC 6455 code).
+  2. Topics split into PARTITIONS; each partition is an append-only commit log on
+     disk (segments + index + your bloom filters), with offset-based reads.
+  3. Producers with configurable acks (0 / 1 / all); idempotent producer IDs to get
+     effectively-once semantics (prove why "exactly once" needs dedup).
+  4. Consumers + CONSUMER GROUPS with automatic partition rebalancing and committed
+     offsets stored durably.
+  5. REPLICATION: each partition has a leader + followers via YOUR Raft; survive the
+     loss of a minority of nodes with zero data loss.
+  6. Cluster membership + failure detection (heartbeats/gossip); leader election;
+     partition reassignment when a node dies.
+  7. Retention: time/size-based deletion AND log compaction (keep latest per key).
+  8. Backpressure + flow control so a slow consumer can't OOM the broker.
+
+ENGINEERING BAR (this is what makes it "expert")
+  - Observability: structured logs, metrics (throughput, p50/p99/p999 latency),
+    pprof endpoints, flamegraphs.
+  - A deterministic simulation test that runs the whole cluster in one thread and
+    injects crashes, network partitions, message reordering, and clock skew, then
+    asserts: no committed message is ever lost, offsets never go backwards, and a
+    consumer group never skips or double-delivers beyond the guaranteed semantics.
+  - A published BENCHMARK (messages/sec, latency percentiles) and a design doc/RFC
+    explaining your trade-offs.
+
+STRETCH GOALS
+  - Tiered storage (offload old segments to object storage).
+  - A simple SQL-ish / KSQL-style query over a topic.
+  - Exactly-once transactional writes across partitions.
+  - A web dashboard (your WebSocket + chat-app UI skills) showing live topics,
+    lag per consumer group, and node health.
+
+WHY THIS PROVES MASTERY - it forces you to combine:
+  Go + concurrency (Wk 1-4, Mo 6) · your own DSA (Wk 5-8) · OS/durability (Wk 9-11)
+  · sockets/WebSockets (Wk 12, Mo 4-5) · storage engine/WAL/LSM (Mo 7) · Raft &
+  distributed systems (Mo 8-9) · queue semantics (Mo 10) · performance (Mo 11) ·
+  correctness/fault-injection testing (Mo 12).
+================================================================================

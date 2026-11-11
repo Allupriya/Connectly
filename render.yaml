@@ -1,0 +1,65 @@
+# Render Blueprint for the Chatting System backend.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy: push this repo to GitHub, then in Render click
+#   "New +" -> "Blueprint" -> pick this repo.
+# Render reads this file and provisions the web service below.
+#
+# Secrets (MONGODB_URL / MONGODB_USERNAME / MONGODB_PASSWORD) have `sync: false`,
+# meaning they are NOT stored in git — you enter them in the Render dashboard.
+
+services:
+  - type: web
+    name: mymotu
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: "pip install -r requirements.txt"
+    # Render provides $PORT; bind to 0.0.0.0 so it's reachable.
+    startCommand: "uvicorn backend.app:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /docs
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      # ---- Secrets: set these in the Render dashboard (not committed) ----
+      - key: MONGODB_URL
+        sync: false
+      - key: MONGODB_USERNAME
+        sync: false
+      - key: MONGODB_PASSWORD
+        sync: false
+      # ---- Web Push (VAPID) secrets: paste your keys in the dashboard ----
+      # Use the SAME keys as your local .env so existing subscriptions keep working.
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      # ---- Non-secret config ----
+      # NOTE: MongoDB database names are case-sensitive. This must match the DB
+      # that holds your data (your local .env uses "Chattingsystem").
+      - key: MONGODB_DB
+        value: Chattingsystem
+      - key: USERS_COLLECTION
+        value: users
+      - key: CHATS_COLLECTION
+        value: chats
+      - key: MESSAGES_COLLECTION
+        value: messages
+      - key: PUSH_SUBSCRIPTIONS_COLLECTION
+        value: push_subscriptions
+      - key: UPLOADS_BUCKET
+        value: uploads
+      - key: VAPID_SUBJECT
+        value: mailto:admin@example.com
+      # ---- Security limits ----
+      - key: MAX_UPLOAD_MB
+        value: "10"
+      - key: MAX_MESSAGE_LENGTH
+        value: "4000"
+      - key: WS_RATE_LIMIT
+        value: "40"
+      # Leave empty to auto-enforce same-origin (correct for a single Render URL).
+      - key: ALLOWED_ORIGINS
+        value: ""
+      - key: LOG_LEVEL
+        value: INFO

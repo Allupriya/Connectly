@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0e1621" />
+  <title>ChatSystem</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&display=swap" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <!-- Login screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="welcome-banner">Welcome to Motu chat </div>
+    <div class="login-card">
+      <h1>ChatSystem</h1>
+      <p>Pick a username to start chatting.</p>
+      <form id="login-form">
+        <input id="username-input" type="text" placeholder="Enter a username" autocomplete="off" required />
+        <button type="submit">Enter</button>
+      </form>
+    </div>
+    <div class="dedication">...</div>
+  </div>
+
+  <!-- Main app -->
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <header class="sidebar-header">
+        <div class="me">
+          <span class="avatar" id="my-avatar"></span>
+          <span id="my-name"></span>
+        </div>
+        <button id="logout-btn" class="icon-btn" title="Log out">&#x23FB;</button>
+      </header>
+
+      <div class="sidebar-actions">
+        <button id="new-dm-btn">+ New chat</button>
+        <button id="new-group-btn">+ New group</button>
+      </div>
+
+      <div class="chat-list" id="chat-list"></div>
+    </aside>
+
+    <main class="chat-panel">
+      <div id="empty-state" class="empty-state">
+        <p>Select a chat or start a new one.</p>
+      </div>
+
+      <div id="conversation" class="conversation hidden">
+        <header class="conversation-header">
+          <button id="back-btn" class="icon-btn back-btn" title="Back">&#8592;</button>
+          <span class="avatar" id="peer-avatar"></span>
+          <div>
+            <div id="peer-name" class="peer-name"></div>
+            <div id="peer-status" class="peer-status"></div>
+          </div>
+        </header>
+
+        <div id="messages" class="messages"></div>
+
+        <div id="typing-indicator" class="typing-indicator"></div>
+
+        <div id="edit-banner" class="edit-banner hidden">
+          <span>Editing message</span>
+          <button id="edit-cancel" type="button" title="Cancel edit">&times;</button>
+        </div>
+
+        <div id="reply-banner" class="reply-banner hidden">
+          <div class="reply-banner-bar"></div>
+          <div class="reply-banner-content">
+            <span id="reply-banner-name" class="reply-banner-name"></span>
+            <span id="reply-banner-text" class="reply-banner-text"></span>
+          </div>
+          <button id="reply-cancel" type="button" title="Cancel reply">&times;</button>
+        </div>
+
+        <form id="message-form" class="message-form">
+          <label class="attach-btn" title="Attach file">
+            &#128206;
+            <input id="file-input" type="file" hidden />
+          </label>
+          <input id="message-input" type="text" placeholder="Type a message..." autocomplete="off" />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal for creating chats / groups -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="modal-title"></h2>
+      <input id="group-name-input" type="text" placeholder="Group name" class="hidden" />
+      <div id="user-picker" class="user-picker"></div>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="secondary">Cancel</button>
+        <button id="modal-confirm">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image lightbox / zoom overlay -->
+  <div id="lightbox" class="lightbox hidden">
+    <img id="lightbox-img" src="" alt="Zoomed image" />
+  </div>
+
+  <!-- Long-press / right-click message actions -->
+  <div id="msg-menu" class="msg-menu hidden">
+    <button type="button" data-action="reply">Reply</button>
+    <button type="button" data-action="copy">Copy</button>
+    <button type="button" data-action="edit">Edit</button>
+    <button type="button" data-action="delete" class="danger">Delete</button>
+  </div>
+
+  <!-- Tap / right-click actions for an image message -->
+  <div id="img-menu" class="msg-menu hidden">
+    <button type="button" data-action="view">View</button>
+    <button type="button" data-action="download">Download</button>
+    <button type="button" data-action="copy">Copy</button>
+    <button type="button" data-action="delete" class="danger">Delete</button>
+  </div>
+
+  <!-- Small transient feedback toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

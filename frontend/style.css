@@ -1,0 +1,511 @@
+:root {
+  --bg: #0e1621;
+  --panel: #17212b;
+  --panel-2: #1f2c39;
+  --accent: #2b5278;
+  --accent-2: #3390ec;
+  --text: #e9edf0;
+  --muted: #7f91a4;
+  --bubble-me: #2b5278;
+  --bubble-them: #212b36;
+  --online: #4dd06e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- Login ---------- */
+.login-screen {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+/* Modern-calligraphy welcome message pinned to the top of the page,
+   outside the login box. */
+.welcome-banner {
+  position: absolute;
+  top: clamp(24px, 8vh, 72px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 0 16px;
+  font-family: "Great Vibes", "Segoe Script", "Brush Script MT", cursive;
+  font-size: clamp(34px, 7vw, 64px);
+  font-weight: 400;
+  line-height: 1.2;
+  background: linear-gradient(90deg, #ff6ec4, #7873f5, #4facfe, #ff6ec4);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: 0 6px 30px rgba(120, 115, 245, 0.25);
+  animation: welcome-shimmer 6s linear infinite;
+}
+
+@keyframes welcome-shimmer {
+  to { background-position: 300% center; }
+}
+
+/* Dedication note placed 2 cm below the login box border. */
+.dedication {
+  margin-top: 2cm;
+  text-align: center;
+  font-family: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
+  font-size: clamp(16px, 2.4vw, 22px);
+  font-weight: 600;
+  color: var(--muted);
+  opacity: 0.95;
+}
+.login-card {
+  background: var(--panel);
+  padding: 40px;
+  border-radius: 16px;
+  width: 340px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+.login-card h1 { margin-bottom: 8px; color: var(--accent-2); }
+.login-card p { color: var(--muted); margin-bottom: 24px; }
+.login-card form { display: flex; flex-direction: column; gap: 12px; }
+.login-card input, .login-card button {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+}
+.login-card input { background: var(--panel-2); color: var(--text); }
+.login-card button { background: var(--accent-2); color: #fff; cursor: pointer; }
+.login-card button:hover { filter: brightness(1.1); }
+
+/* ---------- Layout ---------- */
+.app { display: flex; height: 100vh; height: 100dvh; }
+.back-btn { display: none; font-size: 22px; }
+
+.sidebar {
+  width: 320px;
+  background: var(--panel);
+  border-right: 1px solid #0b131b;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #0b131b;
+}
+.me { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.icon-btn {
+  background: none; border: none; color: var(--muted);
+  font-size: 18px; cursor: pointer;
+}
+.icon-btn:hover { color: var(--text); }
+
+.sidebar-actions { display: flex; gap: 8px; padding: 12px; }
+.sidebar-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+}
+.sidebar-actions button:hover { background: var(--accent); }
+
+.chat-list { flex: 1; overflow-y: auto; }
+.chat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #0b131b;
+}
+.chat-item:hover { background: var(--panel-2); }
+.chat-item.active { background: var(--accent); }
+.chat-item .chat-meta { overflow: hidden; }
+.chat-item .chat-name { font-weight: 600; }
+.chat-item .chat-preview {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* ---------- Avatars ---------- */
+.avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  position: relative;
+}
+.avatar.online::after {
+  content: "";
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 11px; height: 11px;
+  background: var(--online);
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+}
+
+/* ---------- Conversation ---------- */
+.chat-panel { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
+.empty-state {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+}
+.conversation { flex: 1; display: flex; flex-direction: column; height: 100%; }
+.conversation-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid #0b131b;
+}
+.peer-name { font-weight: 600; }
+.peer-status { font-size: 12px; color: var(--muted); }
+.peer-status.online { color: var(--online); }
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.message {
+  max-width: 65%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: transform 0.18s ease;
+}
+.message.them { background: var(--bubble-them); align-self: flex-start; border-bottom-left-radius: 3px; }
+.message.me { background: var(--bubble-me); align-self: flex-end; border-bottom-right-radius: 3px; }
+
+/* Swipe-to-reply: a reply arrow revealed behind the bubble as it slides. */
+.message .swipe-arrow {
+  position: absolute;
+  left: -34px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.6);
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  color: var(--accent-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  pointer-events: none;
+}
+.message.swipe-active .swipe-arrow { opacity: 1; transform: translateY(-50%) scale(1); }
+
+/* Quoted message shown above a reply. */
+.message .reply-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  border-left: 3px solid var(--accent-2);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 12px;
+}
+.message .reply-quote-name { color: var(--accent-2); font-weight: 600; }
+.message .reply-quote-text {
+  color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+/* Read receipts on my own messages. */
+.message .receipt { margin-left: 5px; color: var(--muted); }
+.message .receipt.seen { color: #62b5ff; }
+
+/* Deleted message placeholder. */
+.message .deleted-text { color: var(--muted); font-style: italic; }
+
+/* Prevent the long-press text-selection callout on touch devices. */
+@media (hover: none) {
+  .message { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+}
+.message .sender { font-size: 12px; color: var(--accent-2); font-weight: 600; margin-bottom: 2px; }
+.message .text { word-wrap: break-word; white-space: pre-wrap; }
+.message .time { font-size: 10px; color: var(--muted); text-align: right; margin-top: 3px; }
+.message .time .edited { margin-right: 4px; font-style: italic; }
+.message img { max-width: 260px; border-radius: 8px; display: block; margin-top: 4px; cursor: pointer; }
+.message a.file-link { color: var(--accent-2); text-decoration: none; }
+.message a.file-link:hover { text-decoration: underline; }
+
+/* Edit affordance shown on hover of my own messages. */
+.message { position: relative; }
+.message .edit-btn {
+  position: absolute;
+  top: -8px; right: -8px;
+  width: 22px; height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 11px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.message.me:hover .edit-btn { opacity: 1; }
+.message .edit-btn:hover { background: var(--accent-2); }
+
+/* "Editing message" banner above the composer. */
+.edit-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 18px;
+  background: var(--panel-2);
+  border-top: 1px solid #0b131b;
+  border-left: 3px solid var(--accent-2);
+  font-size: 13px;
+  color: var(--muted);
+}
+.edit-banner button {
+  background: none; border: none; color: var(--muted);
+  font-size: 18px; cursor: pointer; line-height: 1;
+}
+.edit-banner button:hover { color: var(--text); }
+
+/* "Replying to" banner above the composer. */
+.reply-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 18px;
+  background: var(--panel-2);
+  border-top: 1px solid #0b131b;
+}
+.reply-banner .reply-banner-bar {
+  width: 3px; align-self: stretch;
+  background: var(--accent-2);
+  border-radius: 2px;
+}
+.reply-banner-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.reply-banner-name { color: var(--accent-2); font-size: 12px; font-weight: 600; }
+.reply-banner-text {
+  color: var(--muted); font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.reply-banner button {
+  background: none; border: none; color: var(--muted);
+  font-size: 20px; cursor: pointer; line-height: 1;
+}
+.reply-banner button:hover { color: var(--text); }
+
+/* ---------- Long-press / right-click message menu ---------- */
+.msg-menu {
+  position: fixed;
+  z-index: 300;
+  min-width: 140px;
+  background: var(--panel);
+  border: 1px solid #0b131b;
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+.msg-menu button {
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.msg-menu button:hover { background: var(--panel-2); }
+.msg-menu button.danger { color: #ff6b6b; }
+
+/* ---------- Image lightbox ---------- */
+.lightbox {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  cursor: zoom-out;
+  animation: lightbox-fade 0.12s ease;
+}
+.lightbox img {
+  max-width: 92vw;
+  max-height: 92vh;
+  border-radius: 8px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
+}
+@keyframes lightbox-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- Unread badge ---------- */
+.unread-badge {
+  align-self: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--accent-2, #3390ec);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ---------- Transient toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  z-index: 400;
+  background: rgba(20, 30, 40, 0.95);
+  color: var(--text);
+  border: 1px solid #0b131b;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  animation: toast-in 0.15s ease;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---------- Responsive: phones / narrow screens ---------- */
+@media (max-width: 640px) {
+  /* The sidebar fills the screen; the conversation slides in on top of it. */
+  .sidebar {
+    width: 100%;
+    border-right: none;
+  }
+
+  .chat-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+  }
+  .app.chat-open .chat-panel { transform: translateX(0); }
+
+  /* Back button returns to the chat list on mobile. */
+  .back-btn { display: inline-flex; margin-right: 4px; }
+
+  .conversation-header { padding: 10px 12px; }
+  .message { max-width: 82%; }
+  .chat-item .chat-preview { max-width: 65vw; }
+
+  .login-card { width: 88vw; padding: 28px 22px; }
+
+  /* Larger tap targets for the composer. */
+  .message-form { padding: 10px 12px; }
+  .message-form button { padding: 10px 16px; }
+
+  /* Modal fills more of the screen on small devices. */
+  .modal-card { width: 92vw; }
+}
+
+.typing-indicator { padding: 0 20px 4px; height: 18px; font-size: 12px; color: var(--muted); font-style: italic; }
+
+.message-form {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  background: var(--panel);
+  border-top: 1px solid #0b131b;
+}
+.attach-btn { cursor: pointer; font-size: 20px; }
+.message-form input[type="text"] {
+  flex: 1;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 20px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 14px;
+}
+.message-form button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background: var(--accent-2);
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ---------- Modal ---------- */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.modal-card {
+  background: var(--panel);
+  padding: 24px;
+  border-radius: 12px;
+  width: 380px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.modal-card h2 { font-size: 18px; }
+.modal-card input {
+  padding: 10px 12px; border: none; border-radius: 8px;
+  background: var(--panel-2); color: var(--text);
+}
+.user-picker { overflow-y: auto; max-height: 300px; display: flex; flex-direction: column; gap: 4px; }
+.user-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px; cursor: pointer;
+}
+.user-option:hover { background: var(--panel-2); }
+.user-option.selected { background: var(--accent); }
+.user-option .avatar { width: 32px; height: 32px; font-size: 13px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.modal-actions button {
+  padding: 8px 16px; border: none; border-radius: 8px;
+  background: var(--accent-2); color: #fff; cursor: pointer;
+}
+.modal-actions button.secondary { background: var(--panel-2); }
